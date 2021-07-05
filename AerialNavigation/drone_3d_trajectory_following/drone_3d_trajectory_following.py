@@ -34,7 +34,7 @@ Kd_y = 10
 Kd_z = 1
 
 
-def quad_sim(x_c, y_c, z_c):
+def quad_sim(x_c, y_c, z_c, yaw_c):
     """
     Calculates the necessary thrust and torques for the quadrotor to
     follow the trajectory described by the sets of coefficients
@@ -65,7 +65,7 @@ def quad_sim(x_c, y_c, z_c):
                   pitch=pitch, yaw=yaw, size=1, show_animation=show_animation)
 
     i = 0
-    n_run = 8
+    n_run = 2 * len(x_c)
     irun = 0
 
     while True:
@@ -73,20 +73,23 @@ def quad_sim(x_c, y_c, z_c):
             # des_x_pos = calculate_position(x_c[i], t)
             # des_y_pos = calculate_position(y_c[i], t)
             des_z_pos = calculate_position(z_c[i], t)
+            des_yaw = calculate_position(yaw_c[i], t)
             # des_x_vel = calculate_velocity(x_c[i], t)
             # des_y_vel = calculate_velocity(y_c[i], t)
             des_z_vel = calculate_velocity(z_c[i], t)
+            # des_yaw_vel = calculate_velocity(yaw_c[i], t)
             des_x_acc = calculate_acceleration(x_c[i], t)
             des_y_acc = calculate_acceleration(y_c[i], t)
             des_z_acc = calculate_acceleration(z_c[i], t)
+            des_yaw_acc = calculate_acceleration(yaw_c[i], t)
 
             thrust = m * (g + des_z_acc + Kp_z * (des_z_pos -
                                                   z_pos) + Kd_z * (des_z_vel - z_vel))
 
             roll_torque = Kp_roll * \
-                (((des_x_acc * sin(des_yaw) - des_y_acc * cos(des_yaw)) / g) - roll)
+                (((des_x_acc * sin(yaw) - des_y_acc * cos(yaw)) / g) - roll)
             pitch_torque = Kp_pitch * \
-                (((des_x_acc * cos(des_yaw) - des_y_acc * sin(des_yaw)) / g) - pitch)
+                (((des_x_acc * cos(yaw) + des_y_acc * sin(yaw)) / g) - pitch)
             yaw_torque = Kp_yaw * (des_yaw - yaw)
 
             roll_vel += roll_torque * dt / Ixx
@@ -115,7 +118,7 @@ def quad_sim(x_c, y_c, z_c):
             t += dt
 
         t = 0
-        i = (i + 1) % 4
+        i = (i + 1) % len(x_c)
         irun += 1
         if irun >= n_run:
             break
@@ -193,19 +196,26 @@ def main():
     Calculates the x, y, z coefficients for the four segments 
     of the trajectory
     """
-    x_coeffs = [[], [], [], []]
-    y_coeffs = [[], [], [], []]
-    z_coeffs = [[], [], [], []]
-    waypoints = [[-5, -5, 5], [5, -5, 5], [5, 5, 5], [-5, 5, 5]]
 
-    for i in range(4):
-        traj = TrajectoryGenerator(waypoints[i], waypoints[(i + 1) % 4], T)
+    waypoints = [[-5, -5, 5, 0],
+                 [5, -5, 5, 0],
+                 [5, 5, 5, 0],
+                 [-5, 5, 5, 0]]
+
+    x_coeffs = [[]]*len(waypoints)
+    y_coeffs = [[]]*len(waypoints)
+    z_coeffs = [[]]*len(waypoints)
+    yaw_coeffs = [[]]*len(waypoints)
+
+    for i in range(len(waypoints)):
+        traj = TrajectoryGenerator(waypoints[i], waypoints[(i + 1) % len(waypoints)], T)
         traj.solve()
         x_coeffs[i] = traj.x_c
         y_coeffs[i] = traj.y_c
         z_coeffs[i] = traj.z_c
+        yaw_coeffs[i] = traj.yaw_c
 
-    quad_sim(x_coeffs, y_coeffs, z_coeffs)
+    quad_sim(x_coeffs, y_coeffs, z_coeffs, yaw_coeffs)
 
 
 if __name__ == "__main__":
