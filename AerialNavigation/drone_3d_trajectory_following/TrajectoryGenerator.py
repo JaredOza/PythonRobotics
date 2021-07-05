@@ -7,30 +7,36 @@ Author: Daniel Ingram (daniel-s-ingram)
 import numpy as np
 
 class TrajectoryGenerator():
-    def __init__(self, start_pos, des_pos, T, start_vel=[0,0,0], des_vel=[0,0,0], start_acc=[0,0,0], des_acc=[0,0,0]):
+    def __init__(self, start_pos, des_pos, T, start_vel=[0, 0, 0, 0], des_vel=[0, 0, 0, 0], start_acc=[0, 0, 0, 0], des_acc=[0, 0, 0, 0]):
         self.start_x = start_pos[0]
         self.start_y = start_pos[1]
         self.start_z = start_pos[2]
+        self.start_yaw = start_pos[3]
 
         self.des_x = des_pos[0]
         self.des_y = des_pos[1]
         self.des_z = des_pos[2]
+        self.des_yaw = des_pos[3]
 
         self.start_x_vel = start_vel[0]
         self.start_y_vel = start_vel[1]
         self.start_z_vel = start_vel[2]
+        self.start_yaw_vel = start_vel[3]
 
         self.des_x_vel = des_vel[0]
         self.des_y_vel = des_vel[1]
         self.des_z_vel = des_vel[2]
+        self.des_yaw_vel = des_vel[3]
 
         self.start_x_acc = start_acc[0]
         self.start_y_acc = start_acc[1]
         self.start_z_acc = start_acc[2]
+        self.start_yaw_acc = start_acc[3]
 
         self.des_x_acc = des_acc[0]
         self.des_y_acc = des_acc[1]
         self.des_z_acc = des_acc[2]
+        self.des_yaw_acc = des_acc[3]
 
         self.T = T
 
@@ -71,6 +77,16 @@ class TrajectoryGenerator():
              [self.des_z_acc]
             ])
 
+        b_yaw = np.array(
+            [[self.start_yaw],
+             [self.des_yaw],
+             [self.start_yaw_vel],
+             [self.des_yaw_vel],
+             [self.start_yaw_acc],
+             [self.des_yaw_acc]
+             ])
+
         self.x_c = np.linalg.solve(A, b_x)
         self.y_c = np.linalg.solve(A, b_y)
         self.z_c = np.linalg.solve(A, b_z)
+        self.yaw_c = np.linalg.solve(A, b_yaw)
