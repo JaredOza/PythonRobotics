@@ -6,8 +6,11 @@ Author: Daniel Ingram (daniel-s-ingram)
 
 import numpy as np
 
+
 class TrajectoryGenerator():
-    def __init__(self, start_pos, des_pos, T, start_vel=[0, 0, 0, 0], des_vel=[0, 0, 0, 0], start_acc=[0, 0, 0, 0], des_acc=[0, 0, 0, 0]):
+    def __init__(self, start_pos, des_pos, T,
+                 start_vel=[0, 0, 0, 0], des_vel=[0, 0, 0, 0],
+                 start_acc=[0, 0, 0, 0], des_acc=[0, 0, 0, 0]):
         self.start_x = start_pos[0]
         self.start_y = start_pos[1]
         self.start_z = start_pos[2]
@@ -48,7 +51,7 @@ class TrajectoryGenerator():
              [5*self.T**4, 4*self.T**3, 3*self.T**2, 2*self.T, 1, 0],
              [0, 0, 0, 2, 0, 0],
              [20*self.T**3, 12*self.T**2, 6*self.T, 2, 0, 0]
-            ])
+             ])
 
         b_x = np.array(
             [[self.start_x],
@@ -57,7 +60,7 @@ class TrajectoryGenerator():
              [self.des_x_vel],
              [self.start_x_acc],
              [self.des_x_acc]
-            ])
+             ])
 
         b_y = np.array(
             [[self.start_y],
@@ -66,7 +69,7 @@ class TrajectoryGenerator():
              [self.des_y_vel],
              [self.start_y_acc],
              [self.des_y_acc]
-            ])
+             ])
 
         b_z = np.array(
             [[self.start_z],
@@ -75,7 +78,7 @@ class TrajectoryGenerator():
              [self.des_z_vel],
              [self.start_z_acc],
              [self.des_z_acc]
-            ])
+             ])
 
         b_yaw = np.array(
             [[self.start_yaw],

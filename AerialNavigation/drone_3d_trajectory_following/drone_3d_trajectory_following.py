@@ -208,7 +208,8 @@ def main():
     yaw_coeffs = [[]]*len(waypoints)
 
     for i in range(len(waypoints)):
-        traj = TrajectoryGenerator(waypoints[i], waypoints[(i + 1) % len(waypoints)], T)
+        traj = TrajectoryGenerator(
+            waypoints[i], waypoints[(i + 1) % len(waypoints)], T)
         traj.solve()
         x_coeffs[i] = traj.x_c
         y_coeffs[i] = traj.y_c
